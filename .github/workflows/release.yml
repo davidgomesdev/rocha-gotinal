@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    branches: ["main", "feat/add-workflows"]
+  workflow_dispatch:
+
+env:
+  GO_VERSION: 1.20.4
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  build-code:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        arch: [amd64, arm, arm64]
+        os: [linux]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Go '${{ env.GO_VERSION }}'
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: 🌱 - Install project dependencies
+      run: go get .
+
+    - name: 🔨 - Build
+      env:
+        GOOS: ${{ matrix.os }}
+        GOARCH: ${{ matrix.arch }}
+      run: go build .
+
+    - name: 📦 - Copy artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rocha-gotinal_${{ matrix.os }}_${{ matrix.arch }}
+        path: rocha-gotinal
+        if-no-files-found: error
+
+  release:
+    needs: [build-code]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: 📦 - Copy artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
+        merge-multiple: true
+
+    - name: 🧐 - Display structure of downloaded artifacts
+      run: ls -R artifacts/
+
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v4
+      with:
+        branches: |
+          [
+            'main',
+          ]
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
