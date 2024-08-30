@@ -15,7 +15,7 @@ func main() {
 	if token == "" || channelId == "" {
 		log.Fatal("You need to provide BOT_TOKEN and CHANNEL_ID environment variables.")
 	}
-	
+
 	webhookFile, err := os.ReadFile(".webhook_url")
 	exitErr(err)
 
@@ -31,7 +31,7 @@ func main() {
 	sentClips := getSentClips(discord, channelId)
 
 	log.Println("Excluding", len(sentClips), "messages")
-	
+
 	clip := GetRandomClip(sentClips)
 
 	log.Println("Sending", clip.name)

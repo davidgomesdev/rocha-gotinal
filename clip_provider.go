@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -30,34 +31,36 @@ func GetRandomClip(sentClips []string) Clip {
 }
 
 func getUnsentClips(sentClips []string) []Clip {
-	clipFiles, err := os.ReadDir(clipsFolder)
-	exitErr(err)
+	var unsentClips []Clip
 
-	var clips []Clip
+	err := filepath.WalkDir(clipsFolder, func(path string, _ os.DirEntry, err error) error {
+		if err == nil && strings.HasSuffix(path, ".mp3") {
+			clipName := path[strings.LastIndex(path, "/")+1:]
 
-	for _, clip := range clipFiles {
-		clipName := clip.Name()
-		isIntroClip := strings.HasPrefix(clipName, "01")
+			isIntroClip := strings.HasPrefix(clipName, "01")
 
-		if isIntroClip {
-			continue
-		}
+			if isIntroClip {
+				return nil
+			}
 
-		if normalizedClipName := normalizeClipName(clipName); normalizedClipName != "" {
-			if !funk.Contains(sentClips, func(sentClipName string) bool {
-				return sentClipName == normalizedClipName
-			}) {
-				var sb strings.Builder
+			if normalizedClipName := normalizeClipName(clipName); normalizedClipName != "" {
+				if !funk.Contains(sentClips, func(sentClipName string) bool {
+					return sentClipName == normalizedClipName
+				}) {
+					var sb strings.Builder
 
-				sb.WriteString(clipsFolder)
-				sb.WriteString(clipName)
+					sb.WriteString(clipsFolder)
+					sb.WriteString(clipName)
 
-				clips = append(clips, Clip{normalizedClipName, sb.String()})
+					unsentClips = append(unsentClips, Clip{normalizedClipName, sb.String()})
+				}
 			}
 		}
-	}
+		return nil
+	})
+	exitErr(err)
 
-	return clips
+	return unsentClips
 }
 
 func normalizeClipName(originalText string) string {
