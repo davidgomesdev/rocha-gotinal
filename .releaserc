@@ -6,7 +6,7 @@
       "@semantic-release/github",
       {
         "assets": [
-          { "path": "artifacts/rocha_gotinal*" },
+          { "path": "artifacts/rocha_gotinal*" }
         ]
       }
     ]
