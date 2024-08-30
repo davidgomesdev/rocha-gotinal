@@ -39,13 +39,13 @@ jobs:
       env:
         GOOS: ${{ matrix.os }}
         GOARCH: ${{ matrix.arch }}
-      run: go build .
+      run: go build -o rocha-gotinal_${{ matrix.os }}_${{ matrix.arch }} .
 
     - name: 📦 - Copy artifact
       uses: actions/upload-artifact@v4
       with:
         name: rocha-gotinal_${{ matrix.os }}_${{ matrix.arch }}
-        path: rocha-gotinal
+        path: rocha-gotinal_${{ matrix.os }}_${{ matrix.arch }}
         if-no-files-found: error
 
   release:
