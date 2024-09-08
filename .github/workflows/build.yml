@@ -51,6 +51,5 @@ jobs:
       - name: 🔨 - Build
         run: go build .
 
-      # Tests? 🤭
-      # - name: 🧪 - Run tests
-      #   run: cargo test -q
+      - name: 🧪 - Run tests
+        run: cargo test -q
