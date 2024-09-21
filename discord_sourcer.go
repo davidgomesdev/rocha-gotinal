@@ -10,7 +10,7 @@ func getSentClips(discord *discordgo.Session, channelId string) []string {
 	var totalClipsSent []string
 
 	msgs, err := discord.ChannelMessages(channelId, fetchSize, "", "", "")
-	exitErr(err)
+	exitOnErr(err)
 
 	for ok := true; ok; ok = len(msgs) > 0 {
 		for _, msg := range msgs {
@@ -22,7 +22,7 @@ func getSentClips(discord *discordgo.Session, channelId string) []string {
 		}
 
 		newMsgs, err := discord.ChannelMessages(channelId, fetchSize, msgs[len(msgs)-1].ID, "", "")
-		exitErr(err)
+		exitOnErr(err)
 
 		msgs = newMsgs
 	}

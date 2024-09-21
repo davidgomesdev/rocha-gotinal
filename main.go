@@ -17,7 +17,7 @@ func main() {
 	}
 
 	webhookFile, err := os.ReadFile(".webhook_url")
-	exitErr(err)
+	exitOnErr(err)
 
 	webhookUrl := string(webhookFile)
 
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	discord, err := discordgo.New(fmt.Sprint("Bot ", token))
-	exitErr(err)
+	exitOnErr(err)
 
 	sentClips := getSentClips(discord, channelId)
 
@@ -39,7 +39,7 @@ func main() {
 	SendClip(clip, webhookUrl)
 }
 
-func exitErr(err error) {
+func exitOnErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}

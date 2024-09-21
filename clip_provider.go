@@ -30,30 +30,32 @@ func getUnsentClips(sentClips []string) []Clip {
 
 	err := filepath.WalkDir(clipsFolder, func(path string, _ os.DirEntry, err error) error {
 		if err == nil && strings.HasSuffix(path, ".mp3") {
-			clipName := path[strings.LastIndex(path, "/")+1:]
+			normalizedClipName := NormalizeClipName(path)
 
-			isIntroClip := strings.HasPrefix(clipName, "01")
-
-			if isIntroClip {
-				return nil
-			}
-
-			if normalizedClipName := NormalizeClipName(clipName); normalizedClipName != "" {
-				if !funk.Contains(sentClips, func(sentClipName string) bool {
-					return sentClipName == normalizedClipName
-				}) {
-					var sb strings.Builder
-
-					sb.WriteString(clipsFolder)
-					sb.WriteString(clipName)
-
-					unsentClips = append(unsentClips, Clip{normalizedClipName, sb.String()})
-				}
+			if isClipUnsent(normalizedClipName, sentClips) {
+				unsentClips = append(unsentClips, Clip{normalizedClipName, path})
 			}
 		}
+
 		return nil
 	})
-	exitErr(err)
+	exitOnErr(err)
 
 	return unsentClips
+}
+
+func isClipUnsent(normalizedClipName string, sentClips []string) bool {
+	isIntroClip := strings.HasPrefix(normalizedClipName, "01")
+
+	if isIntroClip {
+		return false
+	}
+
+	if !funk.Contains(sentClips, func(sentClipName string) bool {
+		return sentClipName == normalizedClipName
+	}) {
+		return true
+	}
+
+	return false
 }

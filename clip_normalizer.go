@@ -8,7 +8,7 @@ import (
 )
 
 const extract_clip_name_regex = "\\d\\d\\. (.+?) -.+\\.mp3"
-const sanitize_regex = "[^a-zA-Z0-9 -.]+"
+const sanitize_regex = "[^a-zA-Z0-9 .]+"
 
 func NormalizeClipName(originalText string) string {
 	var text = norm.NFD.String(originalText)
