@@ -17,12 +17,16 @@ type Clip struct {
 	filePath string
 }
 
-func GetRandomClip(sentClips []string) Clip {
+func GetRandomClip(sentClips []string) *Clip {
 	clips := getUnsentClips(sentClips)
 
 	log.Println("There are", len(clips), "unsent clips")
 
-	return clips[rand.Intn(len(clips))]
+  if len(clips) == 0 {
+    return nil
+  }
+
+	return &clips[rand.Intn(len(clips))]
 }
 
 func getUnsentClips(sentClips []string) []Clip {

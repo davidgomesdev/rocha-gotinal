@@ -34,9 +34,14 @@ func main() {
 
 	clip := GetRandomClip(sentClips)
 
+	if clip == nil {
+		SendMessage("There are no more clips available!", webhookUrl)
+		os.Exit(0)
+	}
+
 	log.Println("Sending", clip.name)
 
-	SendClip(clip, webhookUrl)
+	SendClip(*clip, webhookUrl)
 }
 
 func exitOnErr(err error) {
